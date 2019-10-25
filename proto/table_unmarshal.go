@@ -1519,6 +1519,20 @@ func unmarshalStringSlice(b []byte, f pointer, w int) ([]byte, error) {
 	return b[x:], nil
 }
 
+func convertToUTF8ValidString(s *string) {
+	v := make([]rune, 0, len(*s))
+	for i, r := range *s {
+		if r == utf8.RuneError {
+			_, size := utf8.DecodeRuneInString((*s)[i:])
+			if size == 1 {
+				continue
+			}
+		}
+		v = append(v, r)
+	}
+	*s = string(v)
+}
+
 func unmarshalUTF8StringValue(b []byte, f pointer, w int) ([]byte, error) {
 	if w != WireBytes {
 		return b, errInternalBadWireType
@@ -1534,6 +1548,9 @@ func unmarshalUTF8StringValue(b []byte, f pointer, w int) ([]byte, error) {
 	v := string(b[:x])
 	*f.toString() = v
 	if !utf8.ValidString(v) {
+		convertToUTF8ValidString(&v)
+		newB := []byte(v)
+		unmarshalUTF8StringValue(newB, f, w)
 		return b[x:], errInvalidUTF8
 	}
 	return b[x:], nil
@@ -1554,6 +1571,9 @@ func unmarshalUTF8StringPtr(b []byte, f pointer, w int) ([]byte, error) {
 	v := string(b[:x])
 	*f.toStringPtr() = &v
 	if !utf8.ValidString(v) {
+		convertToUTF8ValidString(&v)
+		newB := []byte(v)
+		unmarshalUTF8StringValue(newB, f, w)
 		return b[x:], errInvalidUTF8
 	}
 	return b[x:], nil
