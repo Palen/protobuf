@@ -1550,8 +1550,7 @@ func unmarshalUTF8StringValue(b []byte, f pointer, w int) ([]byte, error) {
 	if !utf8.ValidString(v) {
 		convertToUTF8ValidString(&v)
 		newB := []byte(v)
-		unmarshalUTF8StringValue(newB, f, w)
-		return newB[x:], errInvalidUTF8
+		return newB[x:], nil
 	}
 	return b[x:], nil
 }
