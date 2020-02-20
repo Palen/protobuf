@@ -1550,6 +1550,7 @@ func unmarshalUTF8StringValue(b []byte, f pointer, w int) ([]byte, error) {
 	if !utf8.ValidString(v) {
 		convertToUTF8ValidString(&v)
 		newB := []byte(v)
+		fmt.Println("StringValue:", string(newB[x:]))
 		return newB[x:], nil
 	}
 	return b[x:], nil
@@ -1572,6 +1573,7 @@ func unmarshalUTF8StringPtr(b []byte, f pointer, w int) ([]byte, error) {
 	if !utf8.ValidString(v) {
 		convertToUTF8ValidString(&v)
 		newB := []byte(v)
+		fmt.Println("StringPtr:", string(newB[x:]))
 		return newB[x:], nil
 	}
 	return b[x:], nil
