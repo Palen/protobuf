@@ -1551,13 +1551,9 @@ func unmarshalUTF8StringValue(b []byte, f pointer, w int) ([]byte, error) {
 	*f.toString() = v
 	if !utf8.ValidString(v) {
 		convertToUTF8ValidString(&v)
-		newB := []byte(v)
-		fileHandle, _ := os.Create("/tmp/output.txt")
-		writer := bufio.NewWriter(fileHandle)
-		defer fileHandle.Close()
-		fmt.Fprintln(writer, "StringValue:", string(newB[x:]))
-		writer.Flush()
-		return unmarshalStringValue(newB, f, w)
+		*f.toString() = v
+		b = []byte(v)
+
 	}
 	return b[x:], nil
 }
@@ -1578,14 +1574,8 @@ func unmarshalUTF8StringPtr(b []byte, f pointer, w int) ([]byte, error) {
 	*f.toStringPtr() = &v
 	if !utf8.ValidString(v) {
 		convertToUTF8ValidString(&v)
-		newB := []byte(v)
-		fileHandle, _ := os.Create("/tmp/output.txt")
-		writer := bufio.NewWriter(fileHandle)
-		defer fileHandle.Close()
-		fmt.Fprintln(writer, "StringPtr:", string(newB[x:]))
-		writer.Flush()
-
-		return unmarshalUTF8StringPtr(newB, f, w)
+		*f.toStringPtr() = &v
+		b = []byte(v)
 	}
 	return b[x:], nil
 }
@@ -1604,9 +1594,12 @@ func unmarshalUTF8StringSlice(b []byte, f pointer, w int) ([]byte, error) {
 	}
 	v := string(b[:x])
 	s := f.toStringSlice()
-	*s = append(*s, v)
 	if !utf8.ValidString(v) {
-		return b[x:], errInvalidUTF8
+		convertToUTF8ValidString(&v)
+		*s = append(*s, v)
+		b = []byte(v)
+	} else {
+		*s = append(*s, v)
 	}
 	return b[x:], nil
 }
