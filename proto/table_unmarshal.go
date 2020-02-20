@@ -462,7 +462,7 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 	encoding := tagArray[0]
 	name := "unknown"
 	proto3 := false
-	validateUTF8 := true
+	validateUTF8 := false
 	for _, tag := range tagArray[3:] {
 		if strings.HasPrefix(tag, "name=") {
 			name = tag[5:]
