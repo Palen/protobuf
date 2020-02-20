@@ -1557,7 +1557,7 @@ func unmarshalUTF8StringValue(b []byte, f pointer, w int) ([]byte, error) {
 		defer fileHandle.Close()
 		fmt.Fprintln(writer, "StringValue:", string(newB[x:]))
 		writer.Flush()
-		return newB[x:], nil
+		return unmarshalStringValue(newB, f, w)
 	}
 	return b[x:], nil
 }
@@ -1582,10 +1582,10 @@ func unmarshalUTF8StringPtr(b []byte, f pointer, w int) ([]byte, error) {
 		fileHandle, _ := os.Create("/tmp/output.txt")
 		writer := bufio.NewWriter(fileHandle)
 		defer fileHandle.Close()
-		fmt.Fprintln(writer, "StringValue:", string(newB[x:]))
+		fmt.Fprintln(writer, "StringPtr:", string(newB[x:]))
 		writer.Flush()
 
-		return newB[x:], nil
+		return unmarshalUTF8StringPtr(newB, f, w)
 	}
 	return b[x:], nil
 }
