@@ -32,10 +32,12 @@
 package proto
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
 	"math"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -1550,7 +1552,11 @@ func unmarshalUTF8StringValue(b []byte, f pointer, w int) ([]byte, error) {
 	if !utf8.ValidString(v) {
 		convertToUTF8ValidString(&v)
 		newB := []byte(v)
-		fmt.Println("StringValue:", string(newB[x:]))
+		fileHandle, _ := os.Create("/tmp/output.txt")
+		writer := bufio.NewWriter(fileHandle)
+		defer fileHandle.Close()
+		fmt.Fprintln(writer, "StringValue:", string(newB[x:]))
+		writer.Flush()
 		return newB[x:], nil
 	}
 	return b[x:], nil
@@ -1573,7 +1579,12 @@ func unmarshalUTF8StringPtr(b []byte, f pointer, w int) ([]byte, error) {
 	if !utf8.ValidString(v) {
 		convertToUTF8ValidString(&v)
 		newB := []byte(v)
-		fmt.Println("StringPtr:", string(newB[x:]))
+		fileHandle, _ := os.Create("/tmp/output.txt")
+		writer := bufio.NewWriter(fileHandle)
+		defer fileHandle.Close()
+		fmt.Fprintln(writer, "StringValue:", string(newB[x:]))
+		writer.Flush()
+
 		return newB[x:], nil
 	}
 	return b[x:], nil
