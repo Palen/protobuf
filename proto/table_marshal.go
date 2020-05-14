@@ -2055,8 +2055,7 @@ func appendUTF8StringValue(b []byte, ptr pointer, wiretag uint64, _ bool) ([]byt
 	var invalidUTF8 bool
 	v := *ptr.toString()
 	if !utf8.ValidString(v) {
-		convertToUTF8ValidString(&v)
-		b = []byte(v)
+		invalidUTF8 = true
 	}
 	b = appendVarint(b, wiretag)
 	b = appendVarint(b, uint64(len(v)))
@@ -2073,8 +2072,7 @@ func appendUTF8StringValueNoZero(b []byte, ptr pointer, wiretag uint64, _ bool) 
 		return b, nil
 	}
 	if !utf8.ValidString(v) {
-		convertToUTF8ValidString(&v)
-		b = []byte(v)
+		invalidUTF8 = true
 	}
 	b = appendVarint(b, wiretag)
 	b = appendVarint(b, uint64(len(v)))
@@ -2092,8 +2090,7 @@ func appendUTF8StringPtr(b []byte, ptr pointer, wiretag uint64, _ bool) ([]byte,
 	}
 	v := *p
 	if !utf8.ValidString(v) {
-		convertToUTF8ValidString(&v)
-		b = []byte(v)
+		invalidUTF8 = true
 	}
 	b = appendVarint(b, wiretag)
 	b = appendVarint(b, uint64(len(v)))
@@ -2108,8 +2105,7 @@ func appendUTF8StringSlice(b []byte, ptr pointer, wiretag uint64, _ bool) ([]byt
 	s := *ptr.toStringSlice()
 	for _, v := range s {
 		if !utf8.ValidString(v) {
-			convertToUTF8ValidString(&v)
-			b = []byte(v)
+			invalidUTF8 = true
 		}
 		b = appendVarint(b, wiretag)
 		b = appendVarint(b, uint64(len(v)))
