@@ -32,12 +32,10 @@
 package proto
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
 	"math"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -462,7 +460,7 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 	encoding := tagArray[0]
 	name := "unknown"
 	proto3 := false
-	validateUTF8 := false
+	validateUTF8 := true
 	for _, tag := range tagArray[3:] {
 		if strings.HasPrefix(tag, "name=") {
 			name = tag[5:]
@@ -1553,7 +1551,7 @@ func unmarshalUTF8StringValue(b []byte, f pointer, w int) ([]byte, error) {
 		convertToUTF8ValidString(&v)
 		*f.toString() = v
 		b = []byte(v)
-
+		return b, nil
 	}
 	return b[x:], nil
 }
@@ -1576,6 +1574,12 @@ func unmarshalUTF8StringPtr(b []byte, f pointer, w int) ([]byte, error) {
 		convertToUTF8ValidString(&v)
 		*f.toStringPtr() = &v
 		b = []byte(v)
+		x, n = decodeVarint(b)
+		if n == 0 {
+			return nil, io.ErrUnexpectedEOF
+		}
+		b = b[n:]
+
 	}
 	return b[x:], nil
 }
@@ -1598,6 +1602,7 @@ func unmarshalUTF8StringSlice(b []byte, f pointer, w int) ([]byte, error) {
 		convertToUTF8ValidString(&v)
 		*s = append(*s, v)
 		b = []byte(v)
+		return b, nil
 	} else {
 		*s = append(*s, v)
 	}
