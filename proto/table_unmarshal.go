@@ -1574,12 +1574,7 @@ func unmarshalUTF8StringPtr(b []byte, f pointer, w int) ([]byte, error) {
 		convertToUTF8ValidString(&v)
 		*f.toStringPtr() = &v
 		b = []byte(v)
-		x, n = decodeVarint(b)
-		if n == 0 {
-			return nil, io.ErrUnexpectedEOF
-		}
-		b = b[n:]
-
+		return b, nil
 	}
 	return b[x:], nil
 }
